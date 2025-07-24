@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Tier Search</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-4">
+  <div class="container">
+    <h2 class="mb-4">Anime Tier Search</h2>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by name (e.g., 'Ikki')" onkeyup="searchCharacters()">
+      </div>
+      <div class="col-md-3">
+        <select id="tierFilter" class="form-select" onchange="searchCharacters()">
+          <option value="">All Tiers</option>
+          <option value="S">S Tier</option>
+          <option value="A">A Tier</option>
+          <option value="B">B Tier</option>
+          <option value="C">C Tier</option>
+          <option value="D">D Tier</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Name</th>
+          <th>Tier</th>
+          <th>Pros</th>
+          <th>Cons</th>
+        </tr>
+      </thead>
+      <tbody id="resultsTable">
+        <!-- Results will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const characters = [
+      { name: "Michishibo", tier: "S", pros: "Deals bleed damage\nHas the highest one-shot damage", cons: "None" },
+      { name: "Spider Boss", tier: "S", pros: "Huge AOE damage with Poison effect", cons: "Expensive to upgrade" },
+      { name: "Magma Marine", tier: "S", pros: "Deals massive burn damage\nGreat AOE ground damage unit", cons: "Low SPA" },
+      { name: "Slayer Mage", tier: "S", pros: "Meta unit to clear Infinite\nHigh DPS and range", cons: "Long SPA" },
+      { name: "Etri", tier: "S", pros: "Massive DPS with great overall", cons: "Line AOE and decent SPA" },
+      { name: "Xero", tier: "S", pros: "Meta support unit for all game modes", cons: "No DPS and expensive" },
+      { name: "The Strongest One", tier: "S", pros: "High overall", cons: "Expensive to upgrade" },
+      { name: "Dark Wing", tier: "S", pros: "High overall", cons: "High price to place unit" },
+      { name: "Silent-Swordsman", tier: "S", pros: "Great damage, range, and AOE", cons: "SPA low in initial stage" },
+      { name: "Zaruto (Beast Cloak)", tier: "S", pros: "Good SPA and range", cons: "Slightly low DPS for a five star unit" },
+      { name: "Ziek (Beast Giant)", tier: "S", pros: "Best hybrid unit stats", cons: "Initial overall stats" },
+      { name: "Spade", tier: "S", pros: "Good SPA and solid AOE Burn damage", cons: "Low damage" },
+      { name: "Killer (Serious)", tier: "S", pros: "Huge damage and range", cons: "Hill unit only" },
+
+      { name: "Alligator", tier: "A", pros: "Huge damage potential", cons: "Lower AOE effect and huge cost" },
+      { name: "Killer", tier: "A", pros: "Massive damage after upgrades", cons: "Takes time to reach full AOE" },
+      { name: "Mercury Guardian", tier: "A", pros: "Solid damage from first level", cons: "High price to place unit and upgrade" },
+      { name: "Neymar (Trapper)", tier: "A", pros: "Huge damage at maximum level", cons: "Hill unit only" },
+      { name: "King Kaoe", tier: "A", pros: "Great support to boost allies’ damage by 75%", cons: "Destroys the shield of the base" },
+      { name: "Venus", tier: "A", pros: "Good range and AOE damage", cons: "High price to place unit and upgrade" },
+      { name: "Zorro", tier: "A", pros: "Good AOE DPS and range", cons: "Bad SPA and high price to place" },
+      { name: "Mysterious X", tier: "A", pros: "Stun enemies with decent DPS", cons: "Short range and expensive to upgrade" },
+      { name: "Explosion Artist", tier: "A", pros: "Good range and DPS", cons: "Decent SPA and expensive to upgrade" },
+      { name: "Ikki (Hollow)", tier: "A", pros: "Massive DPS with infinite range", cons: "Line AOE and bad SPA" },
+      { name: "Airren", tier: "A", pros: "Strong summoner unit with decent range and high DPS", cons: "Deals single target damage" },
+      { name: "Yuni", tier: "A", pros: "Very high DPS and SPA", cons: "Short-range and expensive upgrade" },
+      { name: "Super Borul", tier: "A", pros: "Massive DPS and range", cons: "Expensive to upgrade" },
+      { name: "Janji", tier: "A", pros: "Great burn damage for a 4-star unit", cons: "Long SPA" },
+      { name: "Jin Sung", tier: "A", pros: "Great DPS and bleed ability", cons: "Long SPA and expensive" },
+
+      { name: "Humble-Swordman (Selection)", tier: "B", pros: "Bleed damage effect and decent DPS", cons: "Long SPA" },
+      { name: "Shirtless Magician", tier: "B", pros: "Can freeze enemies and decent range", cons: "Bad SPA and DPS" },
+      { name: "Super God Koku", tier: "B", pros: "Huge DPS and overall", cons: "Expensive to upgrade" },
+      { name: "Kosuke (TS)", tier: "B", pros: "Great range and DPS", cons: "Long SPA" },
+      { name: "Vegu (Mind)", tier: "B", pros: "Good DPS", cons: "Long SPA and decent range" },
+      { name: "Ramen Grill-Master", tier: "B", pros: "Generates cash every turn\nGood for farming money", cons: "Only useful in early-game as a support" },
+      { name: "Zaruto (Sage)", tier: "B", pros: "Decent DPS and a good story mode unit", cons: "Long SPA" },
+      { name: "Ruffy (Lobby)", tier: "B", pros: "Great range and DPS", cons: "Limited use due to hill placement" },
+      { name: "Whitestache", tier: "B", pros: "Good DPS and full AOE", cons: "Long SPA" },
+      { name: "Kujo", tier: "B", pros: "Good DPS and SPA", cons: "Bad range" },
+      { name: "Nighty", tier: "B", pros: "Quick attacks and decent DPS", cons: "Low range" },
+      { name: "Ikki (HalfMask)", tier: "B", pros: "Good DPS", cons: "Long SPA" },
+      { name: "Blackstache", tier: "B", pros: "Good DPS", cons: "Long SPA and low range" },
+
+      { name: "Anti Magician (Demon)", tier: "C", pros: "Good Damage", cons: "Low SPA and low range" },
+      { name: "Water Goddess", tier: "C", pros: "Good AOE damage with decent range", cons: "Decent SPA" },
+      { name: "Borul", tier: "C", pros: "Good range and DPS", cons: "Expensive to upgrade" },
+      { name: "Stampede", tier: "C", pros: "Good range and high DPS", cons: "Bad SPA and small AOE" },
+      { name: "Super Koku", tier: "C", pros: "Decent DPS and AOE", cons: "Expensive to upgrade" },
+      { name: "Nezichi", tier: "C", pros: "High DPS and decent SPA", cons: "Bad for multiple units" },
+      { name: "Dual Servant", tier: "C", pros: "Good DPS and decent range", cons: "Expensive to upgrade" },
+      { name: "Koro (Lobby)", tier: "C", pros: "Quick attacks and AOE", cons: "Short range at start" },
+      { name: "Zio Brundo", tier: "C", pros: "Massive DPS", cons: "Mid overall" },
+      { name: "Xerxes", tier: "C", pros: "Good overall", cons: "Expensive upgrade" },
+      { name: "The Cursed One", tier: "C", pros: "Deals 2.5x damage every 3rd attack", cons: "Low range and AOE" },
+      { name: "Onwin", tier: "C", pros: "Decent DPS and SPA", cons: "Expensive upgrade and low range" },
+      { name: "Mbappe (Copycat)", tier: "C", pros: "Good overall for a 4-star unit", cons: "Line AOE" },
+      { name: "Gen", tier: "C", pros: "Good overall for a 4-star unit", cons: "Bad against higher enemies" },
+
+      { name: "Ice Queen", tier: "D", pros: "Can freeze enemies", cons: "Low DPS and Long SPA" },
+      { name: "Anti Magician", tier: "D", pros: "Decent DPS and range", cons: "Bad against higher enemies" },
+      { name: "Ikki (Early)", tier: "D", pros: "Good AOE damage", cons: "Decent overall" },
+      { name: "Jon Jo", tier: "D", pros: "High starter DPS", cons: "Only works against single targets and short-range" },
+      { name: "Vegu", tier: "D", pros: "Good unit to clear Story", cons: "Limited use due to hill placement" },
+      { name: "Zaruto", tier: "D", pros: "Decent starter DPS", cons: "Low range and overall potential" },
+      { name: "Kosuke", tier: "D", pros: "Stun ability and good range", cons: "Low DPS" },
+      { name: "Spirit Detective", tier: "D", pros: "Decent starter DPS\nDecent range", cons: "Bad for mid-tier enemies" },
+      { name: "Lami", tier: "D", pros: "Decent DPS", cons: "High total cost for a starter unit" },
+      { name: "Humble Swordsman", tier: "D", pros: "High DPS", cons: "Low overall" },
+      { name: "Koku", tier: "D", pros: "Good starter overall", cons: "Long SPA" },
+      { name: "Koro", tier: "D", pros: "Good starter SPA", cons: "Very short range\nLow DPS" },
+      { name: "Ruffy", tier: "D", pros: "Good range and DPS", cons: "Limited use due to hill placement" },
+      { name: "Captain", tier: "D", pros: "Applies burn damage", cons: "Long SPA makes it hard to clear the waves" },
+      { name: "MiniYou", tier: "D", pros: "Decent DPS", cons: "Overall stats" },
+      { name: "Uru", tier: "D", pros: "Decent DPS and range", cons: "Limited use due to hill placement" }
+    ];
+
+    function searchCharacters() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const tierFilter = document.getElementById("tierFilter").value;
+      const tableBody = document.getElementById("resultsTable");
+      tableBody.innerHTML = "";
+
+      const filtered = characters.filter(c => {
+        const matchesName = c.name.toLowerCase().includes(input);
+        const matchesTier = tierFilter ? c.tier === tierFilter : true;
+        return matchesName && matchesTier;
+      });
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center">No results found</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const row = `<tr>
+          <td>${c.name}</td>
+          <td>${c.tier}</td>
+          <td>${c.pros.replace(/\n/g, '<br>')}</td>
+          <td>${c.cons.replace(/\n/g, '<br>')}</td>
+        </tr>`;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    // Initial load
+    window.onload = searchCharacters;
+  </script>
+</body>
+</html>
